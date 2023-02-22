@@ -1,5 +1,6 @@
 package com.example.application.views.list;
 
+import com.example.application.data.CrmService;
 import com.example.application.data.entity.Contact;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -23,38 +24,40 @@ public class ListView extends VerticalLayout {
 
     Grid<Contact> grid = new Grid<>(Contact.class);
     TextField filterText = new TextField();
-//    Import ContactForm from ContactForm Java
+    //    Import ContactForm from ContactForm Java
     ContactForm form;
+    CrmService service;
 
-    public ListView() {
+    public ListView(CrmService service) {
+        this.service = service;
         addClassName("list-view");
         setSizeFull();
         configureGrid();
         configureForm();
 
         add(getToolbar(), getContent());
+        updateList();
 
     }
 
-//    import content
-    private Component getContent(){
-        HorizontalLayout content = new HorizontalLayout(grid,form);
-        content.setFlexGrow(2,grid);
-        content.setFlexGrow(1,form);
+    //    import content
+    private Component getContent() {
+        HorizontalLayout content = new HorizontalLayout(grid, form);
+        content.setFlexGrow(2, grid);
+        content.setFlexGrow(1, form);
         content.addClassName("content");
         content.setSizeFull();
         return content;
     }
 
-//    Setup Form
-    private void configureForm(){
-        form = new ContactForm(Collections.emptyList(),Collections.emptyList());
+    //    Setup Form
+    private void configureForm() {
+        form = new ContactForm(Collections.emptyList(), Collections.emptyList());
         form.setWidth("25em");
     }
 
 
-
-//    setup value for the table
+    //    setup value for the table
     private void configureGrid() {
         grid.addClassNames("contact-grid");
         grid.setSizeFull();
@@ -64,16 +67,21 @@ public class ListView extends VerticalLayout {
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
     }
 
-//    setup the button in the upper of the table
+    //    setup the button in the upper of the table
     private HorizontalLayout getToolbar() {
         filterText.setPlaceholder("Filter by name...");
         filterText.setClearButtonVisible(true);
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
+        filterText.addValueChangeListener(e -> updateList());
 
         Button addContactButton = new Button("Add contact");
 
         HorizontalLayout toolbar = new HorizontalLayout(filterText, addContactButton);
         toolbar.addClassName("toolbar");
         return toolbar;
+    }
+
+    private void updateList() {
+        grid.setItems(service.findAllContacts(filterText.getValue()));
     }
 }
