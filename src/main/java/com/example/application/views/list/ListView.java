@@ -1,6 +1,7 @@
 package com.example.application.views.list;
 
 import com.example.application.data.entity.Contact;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -12,6 +13,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
 
+import java.util.Collections;
+
 @PWA(name = "Flow CRM Tutorial", shortName = "Flow CRM Tutorial", enableInstallPrompt = false)
 @Theme(themeFolder = "flowcrmtutorial")
 @PageTitle("Contacts | Vaadin CRM")
@@ -20,15 +23,36 @@ public class ListView extends VerticalLayout {
 
     Grid<Contact> grid = new Grid<>(Contact.class);
     TextField filterText = new TextField();
+//    Import ContactForm from ContactForm Java
+    ContactForm form;
 
     public ListView() {
         addClassName("list-view");
         setSizeFull();
         configureGrid();
+        configureForm();
 
-        add(getToolbar(), grid);
+        add(getToolbar(), getContent());
 
     }
+
+//    import content
+    private Component getContent(){
+        HorizontalLayout content = new HorizontalLayout(grid,form);
+        content.setFlexGrow(2,grid);
+        content.setFlexGrow(1,form);
+        content.addClassName("content");
+        content.setSizeFull();
+        return content;
+    }
+
+//    Setup Form
+    private void configureForm(){
+        form = new ContactForm(Collections.emptyList(),Collections.emptyList());
+        form.setWidth("25em");
+    }
+
+
 
 //    setup value for the table
     private void configureGrid() {
